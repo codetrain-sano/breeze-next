@@ -1,7 +1,32 @@
 import AppLayout from '@/components/Layouts/AppLayout'
 import Head from 'next/head'
+import useSWR from 'swr'
+import axios from '@/lib/axios'
+
 
 const Dashboard = () => {
+    // 投稿情報取得
+    const { data: posts, error_post } = useSWR('/api/posts', () =>
+        axios
+            .get('/api/posts')
+            .then(res => res.data)
+            .catch(error => {
+                console.error(error)
+            }),
+    )
+    if (error_post) return 'An error has occurred.'
+
+    // ユーザー情報取得
+    const { data: users, error } = useSWR('/api/users', () =>
+        axios
+            .get('/api/users')
+            .then(res => res.data)
+            .catch(error => {
+                console.error(error)
+            }),
+    )
+    if (error) return 'An error has occurred.'
+
     return (
         <AppLayout
             header={
@@ -17,7 +42,9 @@ const Dashboard = () => {
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 bg-white border-b border-gray-200">
-                            You're logged in!
+                            {/* TODO:[?]は何？ */}
+                            <div class="number">会員登録数:{users?.length}人</div>
+                            <div class="number">累計投稿数:{posts?.length}件</div>
                         </div>
                     </div>
                 </div>
